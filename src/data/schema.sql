@@ -33,4 +33,3 @@ SELECT
 FROM consultant
 JOIN working_hours ON consultant.id = working_hours.consultant_id
 GROUP BY consultant.id;
-
