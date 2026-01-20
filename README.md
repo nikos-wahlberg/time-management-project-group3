@@ -1,1 +1,1 @@
-# time-management-project-group3
+# Time Management project
