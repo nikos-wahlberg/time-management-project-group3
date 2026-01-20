@@ -18,7 +18,7 @@ CREATE TABLE working_hours (
     id SERIAL PRIMARY KEY,
     start_time timestamp,
     end_time timestamp,
-    total_time AS EXTRACT(EPOCH FROM (end_time - start_time)) / 60
+    total_time INT GENERATED ALWAYS AS (EXTRACT(EPOCH FROM (end_time - start_time)) / 60) STORED,
     lunchbreak boolean,
     consultant_id INT NOT NULL REFERENCES consultant(id) ON DELETE SET NULL,
     customer_id INT NOT NULL REFERENCES customer(id) ON DELETE SET NULL
@@ -27,10 +27,9 @@ CREATE TABLE working_hours (
 CREATE MATERIALIZED VIEW total_hours AS
 SELECT 
     consultant.id,
-    SUM(
-      SELECT total_time FROM working_hours WHERE consultant.id = working_hours.consultant_id
-      )
+    SUM(working_hours.total_time) AS total_worked_hours
 FROM consultant
+JOIN working_hours ON consultant.id = working_hours.consultant_id
 GROUP BY consultant.id;
 
 CREATE TRIGGER update_hours_trigger
