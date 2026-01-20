@@ -1,0 +1,3 @@
+az postgres flexible-server create --resource-group team3-timemanagement-rg --name team3timemanagement --location northeurope --admin-user team3admin --admin-password "Password123!" --tier burstable --sku-name Standard_B1ms --storage-size 32 --version 17 --public-access 0.0.0.0-0.0.0.0
+
+az postgres flexible-server db create --resource-group team3-timemanagement-rg --server-name team3timemanagement --database-name team3-timemanagement
