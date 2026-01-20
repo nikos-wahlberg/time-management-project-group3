@@ -1,5 +1,7 @@
 -- schema.sql
 
+DROP VIEW IF EXISTS total_hours;
+DROP TABLE IF EXISTS working_hours;
 DROP TABLE IF EXISTS customer;
 DROP TABLE IF EXISTS consultant;
 
@@ -18,13 +20,13 @@ CREATE TABLE working_hours (
     id SERIAL PRIMARY KEY,
     start_time timestamp,
     end_time timestamp,
-    total_time INT GENERATED ALWAYS AS (EXTRACT(EPOCH FROM (end_time - start_time)) / 60) STORED,
+    total_time FLOAT GENERATED ALWAYS AS (EXTRACT(EPOCH FROM (end_time - start_time))/3600) STORED,
     lunchbreak boolean,
     consultant_id INT NOT NULL REFERENCES consultant(id) ON DELETE SET NULL,
     customer_id INT NOT NULL REFERENCES customer(id) ON DELETE SET NULL
 );
 
-CREATE VIEW total_hours AS
+CREATE  VIEW total_hours AS
 SELECT 
     consultant.id,
     SUM(working_hours.total_time) AS total_worked_hours
