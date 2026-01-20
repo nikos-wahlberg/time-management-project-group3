@@ -2,7 +2,6 @@
 
 DROP TABLE IF EXISTS customer;
 DROP TABLE IF EXISTS consultant;
-DROP TABLE IF EXISTS total_hours;
 
 CREATE TABLE customer (
     id SERIAL PRIMARY KEY,
