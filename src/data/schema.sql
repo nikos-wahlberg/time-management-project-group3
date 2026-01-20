@@ -24,14 +24,10 @@ CREATE TABLE working_hours (
     customer_id INT NOT NULL REFERENCES customer(id) ON DELETE SET NULL
 );
 
-CREATE MATERIALIZED VIEW total_hours AS
+CREATE VIEW total_hours AS
 SELECT 
     consultant.id,
     SUM(working_hours.total_time) AS total_worked_hours
 FROM consultant
 JOIN working_hours ON consultant.id = working_hours.consultant_id
 GROUP BY consultant.id;
-
-CREATE TRIGGER update_hours_trigger
-AFTER INSERT OR UPDATE OR DELETE ON working_hours
-FOR EACH ROW EXECUTE REFRESH MATERIALIZED VIEW CONCURRENTLY total_hours;
