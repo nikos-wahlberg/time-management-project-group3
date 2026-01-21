@@ -5,7 +5,10 @@ from datetime import datetime
 from azure.storage.blob import BlobServiceClient
 from sqlalchemy import create_engine
 from io import StringIO
+from flask import Flask, request, jsonify
+from key_vault import get_database_credentials
 
+app = Flask(__name__)
 # Load Configuration
 def load_config():
     # Ensure we are looking for config.json in the same directory as this script
@@ -15,50 +18,59 @@ def load_config():
     with open(config_path, 'r') as f:
         return json.load(f)['azure']
 
+# def get_db_engine(config):
+#     # Construct the SQLAlchemy connection string
+#     # Format: postgresql://user:password@host:port/database
+#     # host, database, user, password, port = get_database_credentials()
+#     db_uri = f"postgresql://{config['user']}:{config['password']}@{config['host']}:5432/{config['database']}"
+#     return create_engine(db_uri)
 def get_db_engine(config):
     # Construct the SQLAlchemy connection string
     # Format: postgresql://user:password@host:port/database
+    host, database, user, password, port = get_database_credentials()
     db_uri = f"postgresql://{config['user']}:{config['password']}@{config['host']}:5432/{config['database']}"
     return create_engine(db_uri)
-
 def generate_report_content(df):
-    buffer = StringIO()
-    
-    # Header
-    buffer.write(f"CONSULTANT TIME REPORT\nGenerated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-    buffer.write("="*60 + "\n\n")
+    try:
+        buffer = StringIO()
+        
+        # Header
+        buffer.write(f"CONSULTANT TIME REPORT\nGenerated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+        buffer.write("="*60 + "\n\n")
 
-    # --- 1. Daily/Weekly Total by Consultant & Customer ---
-    buffer.write("### 1. DETAILED BREAKDOWN (Consultant & Customer)\n")
-    # Ensure start_time is datetime
-    df['start_time'] = pd.to_datetime(df['start_time'])
-    
-    # Calculate week number
-    df['week'] = df['start_time'].dt.isocalendar().week
-    
-    detailed = df.groupby(['consultant_name', 'customer_name', 'week'])['total_time'].sum().reset_index()
-    
-    for _, row in detailed.iterrows():
-        buffer.write(f"Week {row['week']} | {row['consultant_name']} @ {row['customer_name']}: {row['total_time']:.2f} hrs\n")
-    buffer.write("\n")
+        # --- 1. Daily/Weekly Total by Consultant & Customer ---
+        buffer.write("### 1. DETAILED BREAKDOWN (Consultant & Customer)\n")
+        # Ensure start_time is datetime
+        df['start_time'] = pd.to_datetime(df['start_time'])
+        
+        # Calculate week number
+        df['week'] = df['start_time'].dt.isocalendar().week
+        
+        detailed = df.groupby(['consultant_name', 'customer_name', 'week'])['total_time'].sum().reset_index()
+        
+        for _, row in detailed.iterrows():
+            buffer.write(f"Week {row['week']} | {row['consultant_name']} @ {row['customer_name']}: {row['total_time']:.2f} hrs\n")
+        buffer.write("\n")
 
-    # --- 2. Cumulative Hours by Customer (All Consultants) ---
-    buffer.write("### 2. CUMULATIVE PROJECT HOURS (By Customer)\n")
-    customer_totals = df.groupby('customer_name')['total_time'].sum().reset_index()
-    for _, row in customer_totals.iterrows():
-        buffer.write(f"{row['customer_name']}: {row['total_time']:.2f} Total Hours\n")
-    buffer.write("\n")
+        # --- 2. Cumulative Hours by Customer (All Consultants) ---
+        buffer.write("### 2. CUMULATIVE PROJECT HOURS (By Customer)\n")
+        customer_totals = df.groupby('customer_name')['total_time'].sum().reset_index()
+        for _, row in customer_totals.iterrows():
+            buffer.write(f"{row['customer_name']}: {row['total_time']:.2f} Total Hours\n")
+        buffer.write("\n")
 
-    # --- 3. Average Daily Working Hours per Consultant ---
-    buffer.write("### 3. CONSULTANT EFFICIENCY (Avg Daily Hours)\n")
-    df['date_only'] = df['start_time'].dt.date
-    daily_sums = df.groupby(['consultant_name', 'date_only'])['total_time'].sum().reset_index()
-    avg_daily = daily_sums.groupby('consultant_name')['total_time'].mean().reset_index()
-    
-    for _, row in avg_daily.iterrows():
-        buffer.write(f"{row['consultant_name']}: {row['total_time']:.2f} hrs/day avg\n")
+        # --- 3. Average Daily Working Hours per Consultant ---
+        buffer.write("### 3. CONSULTANT EFFICIENCY (Avg Daily Hours)\n")
+        df['date_only'] = df['start_time'].dt.date
+        daily_sums = df.groupby(['consultant_name', 'date_only'])['total_time'].sum().reset_index()
+        avg_daily = daily_sums.groupby('consultant_name')['total_time'].mean().reset_index()
+        
+        for _, row in avg_daily.iterrows():
+            buffer.write(f"{row['consultant_name']}: {row['total_time']:.2f} hrs/day avg\n")
 
-    return buffer.getvalue()
+        return buffer.getvalue()
+    except Exception as e:
+        print(e)
 
 def run_report_process():
     try:
@@ -105,9 +117,30 @@ def run_report_process():
         return False, f"Missing key in config.json: {e}"
     except Exception as e:
         return False, str(e)
+# Reporting endpoint
+# @app.route('/report', methods=['POST'])
+# def trigger_report():
+#     try:
+#         success, result = run_report_process()
+        
+#         if success:
+#             return jsonify({
+#                 "status": "success", 
+#                 "message": "Report generated and uploaded.", 
+#                 "filename": result
+#             }), 200
+#         else:
+#             return jsonify({
+#                 "status": "error", 
+#                 "message": result
+#             }), 500
+            
+#     except Exception as e:
+#         return jsonify({"status": "error", "message": str(e)}), 500
+
 
 # --- CLI ENTRY POINT ---
-if __name__ == "__main__":
+if __name__ == "__main__":    
     print("Generating report manually...")
     success, message = run_report_process()
     if success:
