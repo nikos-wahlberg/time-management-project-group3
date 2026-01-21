@@ -5,7 +5,10 @@ from datetime import datetime
 from azure.storage.blob import BlobServiceClient
 from sqlalchemy import create_engine
 from io import StringIO
+<<<<<<< HEAD
 from flask import Flask, request, jsonify
+=======
+>>>>>>> 62b01405f5e8204dc6b86a58f1b32c21f3f72194
 from key_vault import get_database_credentials
 
 app = Flask(__name__)
@@ -28,7 +31,11 @@ def get_db_engine(config):
     # Construct the SQLAlchemy connection string
     # Format: postgresql://user:password@host:port/database
     host, database, user, password, port = get_database_credentials()
+<<<<<<< HEAD
     db_uri = f"postgresql://{config['user']}:{config['password']}@{config['host']}:5432/{config['database']}"
+=======
+    db_uri = f"postgresql://{user}:{password}@{host}:5432/{database}"
+>>>>>>> 62b01405f5e8204dc6b86a58f1b32c21f3f72194
     return create_engine(db_uri)
 def generate_report_content(df):
     try:
