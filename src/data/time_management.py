@@ -1,20 +1,22 @@
 import json
 import psycopg2
 from flask import Flask, request, jsonify
-# from key_vault import get_database_credentials
+from key_vault import get_database_credentials
 app = Flask(__name__)
 
-with open('config.json', 'r') as f:
-    config_data = json.load(f)
-    azure_config = config_data['azure']
+#with open('config.json', 'r') as f:
+#    config_data = json.load(f)
+#    azure_config = config_data['azure']
+
+db_credentials = get_database_credentials()
 
 def get_db_connection():
     # host, database, user, passport, port = get_database_credentials()
     return psycopg2.connect(
-        host=azure_config['host'],
-        database=azure_config['database'],
-        user=azure_config['user'],
-        password=azure_config['password'], 
+        host=db_credentials['host'],
+        database=db_credentials['database'],
+        user=db_credentials['user'],
+        password=db_credentials['password'], 
         sslmode="require"
     )
 
