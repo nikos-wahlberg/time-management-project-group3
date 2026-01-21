@@ -1,7 +1,7 @@
 import json
 import psycopg2
 from flask import Flask, request, jsonify
-
+# from key_vault import get_database_credentials
 app = Flask(__name__)
 
 with open('config.json', 'r') as f:
@@ -9,6 +9,7 @@ with open('config.json', 'r') as f:
     azure_config = config_data['azure']
 
 def get_db_connection():
+    # host, database, user, passport, port = get_database_credentials()
     return psycopg2.connect(
         host=azure_config['host'],
         database=azure_config['database'],
@@ -35,7 +36,7 @@ def add_hours():
             data['consultant_id'], 
             data['customer_id']
         ))
-
+        
         conn.commit()
         cursor.close()
         conn.close()
