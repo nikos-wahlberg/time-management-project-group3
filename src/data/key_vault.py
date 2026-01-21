@@ -14,11 +14,11 @@ def get_database_credentials():
 
         # 3. Pull each secret by the Name you gave it in the Portal
         # These names must match EXACTLY what is in your 'Secrets' list
-        host = secret_client.get_secret("postgres-host").value
-        database = secret_client.get_secret("postgres-database").value
-        user = secret_client.get_secret("postgres-user").value
-        password = secret_client.get_secret("postgres-password").value
-        port = secret_client.get_secret("postgres-port").value
+        host = secret_client.get_secret("psql-host").value
+        database = secret_client.get_secret("psql-database").value
+        user = secret_client.get_secret("psql-user").value
+        password = secret_client.get_secret("psql-password").value
+        port = secret_client.get_secret("psql-port").value
 
         return host, database, user, password, port
 
