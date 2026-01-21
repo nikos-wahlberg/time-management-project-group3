@@ -1,5 +1,3 @@
--- schema.sql
-
 DROP VIEW IF EXISTS total_hours;
 DROP TABLE IF EXISTS working_hours;
 DROP TABLE IF EXISTS customer;
