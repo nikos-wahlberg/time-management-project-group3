@@ -2,25 +2,7 @@ import json
 import psycopg2
 from flask import Flask, request, jsonify
 from key_vault import get_database_credentials
-<<<<<<< HEAD
-app = Flask(__name__)
 
-#with open('config.json', 'r') as f:
-#    config_data = json.load(f)
-#    azure_config = config_data['azure']
-
-db_credentials = get_database_credentials()
-
-def get_db_connection():
-    # host, database, user, passport, port = get_database_credentials()
-    return psycopg2.connect(
-        host=db_credentials['host'],
-        database=db_credentials['database'],
-        user=db_credentials['user'],
-        password=db_credentials['password'], 
-        sslmode="require"
-    )
-=======
 # from key_vault import get_database_credentials
 from reporting import run_report_process
 
@@ -52,7 +34,6 @@ def get_db_connection():
 #         password=azure_config['password'], 
 #         sslmode="require"
 #     )
->>>>>>> d56e834c0d8f9b93a4cfc6aa7a9f5e9959fb740e
 
 @app.route('/add-hours', methods=['POST'])
 def add_hours():
