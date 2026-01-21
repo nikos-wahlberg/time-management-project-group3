@@ -18,9 +18,15 @@ def get_database_credentials():
         database = secret_client.get_secret("psql-database").value
         user = secret_client.get_secret("psql-user").value
         password = secret_client.get_secret("psql-password").value
+        blob_url = secret_client.get_secret("azure-storage-blob-url").value
+        container_name = secret_client.get_secret("container-name").value
+        resource_group_name = secret_client.get_secret("resource-group-name").value
+        storage_account_name = secret_client.get_secret("storage-account-name").value
+        storage_connection = secret_client.get_secret("storage-connection-string").value
+        subscription_id = secret_client.get_secret("subscription-id").value
         port = secret_client.get_secret("psql-port").value
 
-        return host, database, user, password, port
+        return host, database, user, password, port, blob_url, container_name, resource_group_name, storage_account_name, storage_account_name, storage_connection, subscription_id
 
     except Exception as e:
         print(f"Error retrieving secrets: {e}")
