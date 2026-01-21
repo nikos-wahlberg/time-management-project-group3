@@ -2,6 +2,8 @@ import json
 import psycopg2
 from flask import Flask, request, jsonify
 # from key_vault import get_database_credentials
+from reporting import run_report_process
+
 app = Flask(__name__)
 
 with open('config.json', 'r') as f:
@@ -42,6 +44,27 @@ def add_hours():
         conn.close()
         return jsonify({"status": "success", "message": "Logged to Azure!"}), 201
 
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+# Reporting endpoint
+@app.route('/report', methods=['POST'])
+def trigger_report():
+    try:
+        success, result = run_report_process()
+        
+        if success:
+            return jsonify({
+                "status": "success", 
+                "message": "Report generated and uploaded.", 
+                "filename": result
+            }), 200
+        else:
+            return jsonify({
+                "status": "error", 
+                "message": result
+            }), 500
+            
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
