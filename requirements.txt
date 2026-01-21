@@ -34,12 +34,9 @@ python-dateutil==2.9.0.post0
 python-dotenv==1.2.1
 pytz==2025.2
 requests==2.32.5
-<<<<<<< HEAD
-=======
 requests-oauthlib==2.0.0
 six==1.17.0
 SQLAlchemy==2.0.45
->>>>>>> d56e834c0d8f9b93a4cfc6aa7a9f5e9959fb740e
 tkcalendar==1.6.1
 typing_extensions==4.15.0
 tzdata==2025.3
