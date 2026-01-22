@@ -7,7 +7,12 @@ app = Flask(__name__)
 
 def get_db_connection():
     try:
-        host, database, user, password, *_ = get_database_credentials()
+        creds = get_database_credentials()
+        host = creds["host"]
+        database = creds["database"]
+        user = creds["user"]
+        password = creds["password"]
+
         return psycopg2.connect(
             host=host,
             database=database,
