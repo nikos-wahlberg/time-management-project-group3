@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 def get_db_connection():
     try:
-        host, database, user, password, port = get_database_credentials()
+        host, database, user, password, *_ = get_database_credentials()
         return psycopg2.connect(
             host=host,
             database=database,
@@ -46,26 +46,6 @@ def add_hours():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
-# Reporting endpoint
-# @app.route('/report', methods=['POST'])
-# def trigger_report():
-#     try:
-#         success, result = run_report_process()
-        
-#         if success:
-#             return jsonify({
-#                 "status": "success", 
-#                 "message": "Report generated and uploaded.", 
-#                 "filename": result
-#             }), 200
-#         else:
-#             return jsonify({
-#                 "status": "error", 
-#                 "message": result
-#             }), 500
-            
-#     except Exception as e:
-#         return jsonify({"status": "error", "message": str(e)}), 500
-
 if __name__ == '__main__':
     app.run(debug=True)
+
