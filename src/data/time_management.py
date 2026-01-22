@@ -2,13 +2,8 @@ import json
 import psycopg2
 from flask import Flask, request, jsonify
 from key_vault import get_database_credentials
-from reporting import run_report_process
 
 app = Flask(__name__)
-
-# with open('config.json', 'r') as f:
-#     config_data = json.load(f)
-#     azure_config = config_data['azure']
 
 def get_db_connection():
     try:
