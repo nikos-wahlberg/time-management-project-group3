@@ -26,8 +26,8 @@ CREATE TABLE working_hours (
              ELSE 0 
          END) / 3600
     ) STORED,
-    consultant_id INT NOT NULL REFERENCES consultant(id) ON DELETE SET NULL,
-    customer_id INT NOT NULL REFERENCES customer(id) ON DELETE SET NULL
+    consultant_id INT NOT NULL REFERENCES consultant(id) ON DELETE CASCADE, 
+    customer_id INT NOT NULL REFERENCES customer(id) ON DELETE CASCADE
 );
 
 CREATE  VIEW total_hours AS

@@ -16,18 +16,13 @@ def load_config():
     with open(config_path, 'r') as f:
         return json.load(f)['azure']
 
-# def get_db_engine(config):
-#     # Construct the SQLAlchemy connection string
-#     # Format: postgresql://user:password@host:port/database
-#     # host, database, user, password, port = get_database_credentials()
-#     db_uri = f"postgresql://{config['user']}:{config['password']}@{config['host']}:5432/{config['database']}"
-#     return create_engine(db_uri)
-def get_db_engine(config):
+def get_database_engine():
     # Construct the SQLAlchemy connection string
     # Format: postgresql://user:password@host:port/database
     host, database, user, password, port = get_database_credentials()
     db_uri = f"postgresql://{user}:{password}@{host}:5432/{database}"
     return create_engine(db_uri)
+
 def generate_report_content(df):
     try:
         buffer = StringIO()
@@ -75,7 +70,7 @@ def run_report_process():
         config = load_config()
         
         # 1. READ DATA FROM DB (Using SQLAlchemy Engine)
-        engine = get_db_engine(config)
+        engine = get_database_engine(config)
         
         query = """
             SELECT 
