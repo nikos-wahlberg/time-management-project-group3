@@ -12,8 +12,13 @@ class DatabasePool:
         """Initializes the connection pool once when the app starts."""
         # Unpack the tuple from your key_vault.py
         # Note: We use *_ to ignore the storage blob credentials we don't need here
-        host, db_name, user, password, port, *_ = get_database_credentials()
-        
+        creds = get_database_credentials()
+        host = creds["host"]
+        db_name = creds["database"]
+        user = creds["user"]
+        password = creds["password"]
+        port = creds["port"]
+
         self._pool = psycopg2.pool.ThreadedConnectionPool(
             minconn=1,
             maxconn=5,
