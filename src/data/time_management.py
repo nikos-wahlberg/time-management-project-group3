@@ -1,8 +1,16 @@
+
+import sys
+import os
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+src_dir = os.path.dirname(current_dir)
+
+if src_dir not in sys.path:
+    sys.path.append(src_dir)
 import json
 import psycopg2
 from flask import Flask, request, jsonify
-from key_vault import get_database_credentials
-
+from server.key_vault import get_database_credentials
 app = Flask(__name__)
 
 def get_db_connection():
