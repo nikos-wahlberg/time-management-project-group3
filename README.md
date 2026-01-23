@@ -68,22 +68,26 @@ The project consists of two main applications communicating with Azure services:
 
 ```text
 time-management-project-group3/
-├── README.md               # Project documentation
-├── requirements.txt        # Python dependencies
-├── .gitignore              # Ignored files (secrets, venv, .pem)
+├── README.md                 # Project documentation
+├── requirements.txt          # Python dependencies
+├── .gitignore                # Ignored files (secrets, venv, .pem)
 ├── src/
-│   ├── client/             # Local GUI Application
-│   │   ├── main_window.py  # UI Logic 
-│   │   ├── api_service.py  # API Communication
-│   │   └── main.py         # App Entry point
+│   ├── client/               # Frontend Application
+│   │   ├── __init__.py       # Makes client a Python package
+│   │   ├── api_service.py    # API communication (safe_request, etc.)
+│   │   ├── main_window.py    # UI Logic (PyQt/Tkinter window)
+│   │   └── main.py           # App Entry point (starts server & GUI)
 │   │
-│   ├── data/               # Backend Data & Cloud Logic
-│   │   ├── key_vault.py        # Fetches secrets from Azure
-│   │   ├── connect.py          # Database connection logic
-│   │   ├── reporting.py        # Report generation script
-│   │   ├── send_to_azure.py    # Blob Storage upload logic
-│   │   ├── fetch_data.py       # SQL data retrieval
-│   │   ├── schema.sql          # Database table structure
-│   │   └── blobs/              # Local staging for reports
+│   ├── data/                 # Shared Data & Cloud Utility Logic
+│   │   ├── blobs/            # Folder for local report staging
+│   │   ├── __init__.py       # Makes data a Python package
+│   │   ├── dummydata.sql     # Sample data for testing
+│   │   ├── reporting.py      # Report generation logic
+│   │   ├── schema.sql        # Database table structure
 │   │
-│   └── server/             # Flask Server Logic
+│   └── server/               # RESTful Flask Backend
+│       ├── __init__.py       # Makes server a Python package
+│       ├── app.py            # Flask API routes & app.run()
+│       ├── database.py       # Server-side DB pool initialization
+│       ├── key_vault.py      # Server-side secret retrieval
+│       └── queries.py        # SQL query execution (insert/delete)
