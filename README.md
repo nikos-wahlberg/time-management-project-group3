@@ -53,14 +53,14 @@ The project consists of two main applications communicating with Azure services:
 
 ## 🧠 Challenges & Learnings
 
-### 🚧 Key Challenges
-* **VM Configuration:** Setting up the Virtual Machine and managing the remote desktop connection via **X2Go** was the most significant technical hurdle.
-* **Team Coordination:** Dividing tasks among 4 people proved difficult initially. We shifted to a collaborative "mob programming" approach which improved code quality and understanding.
-
 ### ✅ Successes
 * **Secure Credentials:** Successfully implemented **Azure Key Vault** for secure credential management.
 * **Full Pipeline:** Built a fully functional pipeline from Local GUI -> Cloud DB -> VM Processing -> Blob Storage.
 * **Project Management:** Effective use of **Jira** for tracking progress.
+
+### 🚧 Key Challenges
+* **VM Configuration:** Setting up the Virtual Machine and managing the remote desktop connection via **X2Go** was the most significant technical hurdle.
+* **Team Coordination:** Dividing tasks among 4 people proved difficult initially. We shifted to a collaborative "mob programming" approach which improved code quality and understanding.
 
 ---
 
