@@ -12,36 +12,30 @@ from queries import (
 
 app = Flask(__name__)
 
-# Initialize the DB pool when the Flask app starts
 with app.app_context():
     try:
         db.initialize()
     except Exception as e:
         print(f"Failed to connect to DB: {e}")
 
-# 1. Configure Server Logging (Save errors to a file)
 logging.basicConfig(
     filename='server_errors.log', 
     level=logging.ERROR,
     format='%(asctime)s %(levelname)s: %(message)s'
 )
 
-# 2. Global Error Handler
-# This catches ANY exception that happens in your code
 @app.errorhandler(Exception)
 def handle_exception(e):
-    # Pass through HTTP errors (like 404, 403)
     if isinstance(e, HTTPException):
         return jsonify({"error": e.description}), e.code
 
-    # Log the full traceback to the file for YOU to read later
     logging.exception("An unhandled error occurred:")
 
-    # Return a clean JSON message to the CLIENT
     return jsonify({
         "error": "Internal Server Error",
-        "details": str(e) # Optional: Remove this in production for security
+        "details": str(e) 
     }), 500
+    
 @app.route('/api/options', methods=['GET'])
 def get_options():
     """
@@ -79,9 +73,8 @@ def submit_work():
             customer_id=payload['customer_id'],
             start_time=payload['start_time'],
             end_time=payload['end_time'],
-            lunchbreak=payload.get('lunchbreak', False) # Default to False if missing
+            lunchbreak=payload.get('lunchbreak', False) 
         )
-        print(record_id)
         
         return jsonify({"status": "success", "id": record_id}), 201
 
@@ -98,8 +91,6 @@ def add_consultant_route():
             
         new_id = insert_consultant(data['name'])
         
-        # --- CHANGED LINE BELOW ---
-        # Now includes data['name'] in the message
         return jsonify({
             "status": "success", 
             "id": new_id, 
@@ -118,8 +109,6 @@ def add_customer_route():
             
         new_id = insert_customer(data['name'], data.get('max_allocated_hours', 0))
         
-        # --- CHANGED LINE BELOW ---
-        # Now includes data['name'] in the message
         return jsonify({
             "status": "success", 
             "id": new_id, 
@@ -128,6 +117,7 @@ def add_customer_route():
         
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 @app.route('/api/consultants/<int:id>', methods=['DELETE'])
 def delete_consultant_route(id):
     try:
@@ -143,6 +133,6 @@ def delete_customer_route(id):
         return jsonify({"status": "success", "message": f"Deleted Customer ID: {id}"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-if __name__ == '__main__':
-    # Run on 0.0.0.0 to be accessible, port 5000 is standard
-    app.run(host='0.0.0.0', port=5000, debug=True)
+# if __name__ == '__main__':
+#     # Run on 0.0.0.0 to be accessible, port 5000 is standard
+app.run(host='127.0.0.1', port=5000, debug=True)

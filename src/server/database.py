@@ -10,8 +10,7 @@ class DatabasePool:
 
     def initialize(self):
         """Initializes the connection pool once when the app starts."""
-        # Unpack the tuple from your key_vault.py
-        # Note: We use *_ to ignore the storage blob credentials we don't need here
+
         creds = get_database_credentials()
         host = creds["host"]
         db_name = creds["database"]
@@ -29,7 +28,6 @@ class DatabasePool:
             port=port,
             sslmode="require"
         )
-        print("Database connection pool created.")
 
     @contextmanager
     def get_cursor(self):
@@ -51,5 +49,4 @@ class DatabasePool:
         finally:
             self._pool.putconn(conn)
 
-# Create a singleton instance to be used by other modules
 db = DatabasePool()

@@ -5,7 +5,6 @@ import time
 import atexit
 from main_window import TimeLoggerApp
 
-# Global variable to track the server process
 server_process = None
 
 def start_server():
@@ -14,26 +13,21 @@ def start_server():
     """
     global server_process
     
-    # 1. Calculate path to server/app.py relative to this file
-    # client/main.py -> up one level -> server -> app.py
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    project_root = os.path.dirname(current_dir) # Go up to 'src'
+    project_root = os.path.dirname(current_dir) 
     server_script = os.path.join(project_root, 'server', 'app.py')
 
-    print(f"--- Launching Server: {server_script} ---")
+    print(f"--- Launching Server: ---")
 
     try:
-        # 2. Start the process non-blocking (Popen)
-        # We set the cwd (current working directory) to the server folder
-        # so it can find 'database.py' and 'key_vault.py' easily.
         server_process = subprocess.Popen(
             [sys.executable, server_script],
-            cwd=os.path.dirname(server_script)
+            cwd=os.path.dirname(server_script),
+            stdout=subprocess.DEVNULL,  
+            stderr=subprocess.STDOUT
         )
         
-        # 3. Give it a moment to connect to Azure/Database
-        print("Waiting 2 seconds for server startup...")
-        time.sleep(2)
+        time.sleep(3)
         
     except Exception as e:
         print(f"CRITICAL ERROR: Failed to start server: {e}")
@@ -48,18 +42,14 @@ def cleanup_server():
         server_process.terminate()
         server_process = None
 
-# Register the cleanup function to run automatically when Python exits
 atexit.register(cleanup_server)
 
 if __name__ == "__main__":
-    # 1. Start the backend
     start_server()
 
-    # 2. Start the frontend
     try:
         app = TimeLoggerApp()
         app.mainloop()
     except Exception as e:
         print(f"GUI Error: {e}")
     
-    # The atexit handler will trigger here automatically

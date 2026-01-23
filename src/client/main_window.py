@@ -57,7 +57,7 @@ class TimeLoggerApp(tk.Tk):
                                     foreground='white', borderwidth=2, date_pattern='yyyy-mm-dd')
         self.date_entry.pack(pady=5)
 
-        # --- NEW: Time Frame Selection ---
+        # --- Time Frame Selection ---
         time_frame = ttk.LabelFrame(frame, text="Work Hours (24h format)", padding=(10, 10))
         time_frame.pack(pady=10)
 
@@ -65,8 +65,8 @@ class TimeLoggerApp(tk.Tk):
         ttk.Label(time_frame, text="Start:").grid(row=0, column=0, padx=5)
         
         # 1. Create Variables for Start Time
-        self.var_start_h = tk.StringVar(value="09") # Default 09
-        self.var_start_m = tk.StringVar(value="00") # Default 00
+        self.var_start_h = tk.StringVar(value="09") 
+        self.var_start_m = tk.StringVar(value="00") 
 
         # 2. Bind them to the Spinboxes using 'textvariable'
         tk.Spinbox(time_frame, from_=0, to=23, width=3, format="%02.0f", wrap=True, textvariable=self.var_start_h).grid(row=0, column=1)
@@ -77,8 +77,8 @@ class TimeLoggerApp(tk.Tk):
         ttk.Label(time_frame, text="End:").grid(row=1, column=0, padx=5, pady=5)
         
         # 3. Create Variables for End Time
-        self.var_end_h = tk.StringVar(value="17") # Default 17 (5 PM)
-        self.var_end_m = tk.StringVar(value="00") # Default 00
+        self.var_end_h = tk.StringVar(value="17") 
+        self.var_end_m = tk.StringVar(value="00") 
         
         tk.Spinbox(time_frame, from_=0, to=23, width=3, format="%02.0f", wrap=True, textvariable=self.var_end_h).grid(row=1, column=1, pady=5)
         ttk.Label(time_frame, text=":").grid(row=1, column=2)
@@ -93,6 +93,7 @@ class TimeLoggerApp(tk.Tk):
         self.submit_btn.pack(pady=10)
         
         ttk.Button(frame, text="🔄 Refresh Data", command=self.load_data).pack(pady=5)
+
     def setup_consultant_tab(self):
         """Builds the interface to Add OR Delete a consultant"""
         frame = self.tab_add_consultant
@@ -114,7 +115,6 @@ class TimeLoggerApp(tk.Tk):
         
         ttk.Label(frame, text="Select to Delete:").pack(pady=5)
         self.del_cons_var = tk.StringVar()
-        # We reuse the logic from the main tab to populate this dropdown
         self.del_cons_combo = ttk.Combobox(frame, textvariable=self.del_cons_var, state="readonly", width=30)
         self.del_cons_combo.pack(pady=5)
 
@@ -137,10 +137,8 @@ class TimeLoggerApp(tk.Tk):
         
         ttk.Button(frame, text="Create Customer", command=self.submit_new_customer).pack(pady=10)
 
-        # --- SEPARATOR ---
         ttk.Separator(frame, orient='horizontal').pack(fill='x', pady=20, padx=20)
 
-        # --- SECTION: DELETE ---
         ttk.Label(frame, text="Delete Existing Customer", font=("Helvetica", 12, "bold"), foreground="red").pack(pady=10)
         
         ttk.Label(frame, text="Select to Delete:").pack(pady=5)
@@ -149,26 +147,34 @@ class TimeLoggerApp(tk.Tk):
         self.del_cust_combo.pack(pady=5)
 
         ttk.Button(frame, text="❌ Delete Selected", command=self.submit_delete_customer).pack(pady=10)
-    # --- LOGIC FUNCTIONS ---
 
-    # def load_data(self):
-    #     data = api_service.fetch_options()
-    #     if not data or "error" in data:
-    #         if data: messagebox.showerror("Error", data["error"])
-    #         return
+    def load_data(self):
+        """Fetches data and populates ALL dropdowns in the app"""
+        self.submit_btn.config(state="disabled") 
+        
+        data = api_service.fetch_options()
+        if not data or "error" in data:
+            if data: messagebox.showerror("Error", data["error"])
+            return
 
-    #     # Update Dropdowns
-    #     self.consultant_map = {c['name']: c['id'] for c in data.get('consultants', [])}
-    #     self.consultant_combo['values'] = list(self.consultant_map.keys())
+        self.consultant_map = {c['name']: c['id'] for c in data.get('consultants', [])}
+        self.customer_map = {c['name']: c['id'] for c in data.get('customers', [])}
+        
+        cons_list = list(self.consultant_map.keys())
+        cust_list = list(self.customer_map.keys())
+        
+        self.consultant_combo['values'] = cons_list
+        self.customer_combo['values'] = cust_list
 
-    #     self.customer_map = {c['name']: c['id'] for c in data.get('customers', [])}
-    #     self.customer_combo['values'] = list(self.customer_map.keys())
+        self.del_cons_combo['values'] = cons_list
+        self.del_cust_combo['values'] = cust_list
+
+        self.submit_btn.config(state="normal") 
 
     def submit_worklog(self):
         cons_name = self.consultant_var.get()
         cust_name = self.customer_var.get()
         
-        # 1. Get Date String
         date_str = self.date_entry.get_date()
         if isinstance(date_str, type(datetime.now().date())):
             date_str = date_str.strftime("%Y-%m-%d")
@@ -180,29 +186,30 @@ class TimeLoggerApp(tk.Tk):
             return
 
         try:
-            # --- FIXED SECTION BELOW ---
-            # We must use the StringVar variables (self.var_...) 
-            # instead of the old widget names (self.start_h)
-            
             sh = f"{int(self.var_start_h.get()):02d}"
             sm = f"{int(self.var_start_m.get()):02d}"
             eh = f"{int(self.var_end_h.get()):02d}"
             em = f"{int(self.var_end_m.get()):02d}"
-            # ---------------------------
 
-            # 3. Construct Timestamp Strings
             start_dt_str = f"{date_str} {sh}:{sm}:00"
             end_dt_str = f"{date_str} {eh}:{em}:00"
 
-            # 4. Validation
             start_dt = datetime.strptime(start_dt_str, "%Y-%m-%d %H:%M:%S")
             end_dt = datetime.strptime(end_dt_str, "%Y-%m-%d %H:%M:%S")
+
+            if start_dt > datetime.now():
+                messagebox.showerror("Date Error", "You cannot submit work hours for a future date/time.")
+                return
+            
+            if end_dt > datetime.now():
+                messagebox.showerror("Time Error", "You cannot log hours that haven't occurred yet.")
+                return
 
             if end_dt <= start_dt:
                 messagebox.showerror("Time Error", "End time must be after Start time.")
                 return
+  
 
-            # 5. Prepare Payload
             payload = {
                 "consultant_id": self.consultant_map[cons_name],
                 "customer_id": self.customer_map[cust_name],
@@ -211,14 +218,12 @@ class TimeLoggerApp(tk.Tk):
                 "lunchbreak": self.lunch_var.get()
             }
 
-            # 6. Send
             result = api_service.submit_worklog(payload)
             
             if "error" in result:
                 messagebox.showerror("Server Error", result["error"])
             else:
                 messagebox.showinfo("Success", "Worklog saved successfully!")
-                # Reset times to default using the variables
                 self.var_start_h.set("09")
                 self.var_start_m.set("00")
                 self.var_end_h.set("17")
@@ -240,8 +245,8 @@ class TimeLoggerApp(tk.Tk):
             messagebox.showerror("Error", result["error"])
         else:
             messagebox.showinfo("Success", result["message"])
-            self.new_cons_name.set("") # Clear input
-            self.load_data() # Refresh dropdowns in the first tab!
+            self.new_cons_name.set("") 
+            self.load_data() 
 
     def submit_new_customer(self):
         name = self.new_cust_name.get()
@@ -250,7 +255,6 @@ class TimeLoggerApp(tk.Tk):
             messagebox.showwarning("Input Error", "Name is required")
             return
             
-        # Default hours to 0 if empty
         if not hours: hours = "0"
             
         result = api_service.add_new_customer(name, int(hours))
@@ -260,33 +264,7 @@ class TimeLoggerApp(tk.Tk):
             messagebox.showinfo("Success", result["message"])
             self.new_cust_name.set("")
             self.new_cust_hours.set("")
-            self.load_data() # Refresh dropdowns in the first tab!
-
-    def load_data(self):
-        """Fetches data and populates ALL dropdowns in the app"""
-        self.submit_btn.config(state="disabled") # Disable while loading
-        
-        data = api_service.fetch_options()
-        if not data or "error" in data:
-            if data: messagebox.showerror("Error", data["error"])
-            return
-
-        # 1. Update Maps
-        self.consultant_map = {c['name']: c['id'] for c in data.get('consultants', [])}
-        self.customer_map = {c['name']: c['id'] for c in data.get('customers', [])}
-        
-        # 2. Update Main Tab Dropdowns
-        cons_list = list(self.consultant_map.keys())
-        cust_list = list(self.customer_map.keys())
-        
-        self.consultant_combo['values'] = cons_list
-        self.customer_combo['values'] = cust_list
-
-        # 3. Update DELETE Tab Dropdowns (New!)
-        self.del_cons_combo['values'] = cons_list
-        self.del_cust_combo['values'] = cust_list
-
-        self.submit_btn.config(state="normal") # Re-enable
+            self.load_data() 
 
     def submit_delete_consultant(self):
         name = self.del_cons_var.get()
@@ -294,12 +272,10 @@ class TimeLoggerApp(tk.Tk):
             messagebox.showwarning("Selection Error", "Please select a consultant to delete.")
             return
             
-        # Confirm with user before deleting
         confirm = messagebox.askyesno("Confirm Delete", f"Are you sure you want to delete '{name}'?\nThis cannot be undone.")
         if not confirm:
             return
 
-        # Get ID from map and send request
         cons_id = self.consultant_map[name]
         result = api_service.delete_consultant_by_id(cons_id)
 
@@ -307,8 +283,8 @@ class TimeLoggerApp(tk.Tk):
             messagebox.showerror("Error", result["error"])
         else:
             messagebox.showinfo("Success", f"Deleted Consultant: {name}")
-            self.del_cons_var.set("") # Clear selection
-            self.load_data() # Refresh all lists immediately
+            self.del_cons_var.set("") 
+            self.load_data() 
 
     def submit_delete_customer(self):
         name = self.del_cust_var.get()
@@ -329,3 +305,4 @@ class TimeLoggerApp(tk.Tk):
             messagebox.showinfo("Success", f"Deleted Customer: {name}")
             self.del_cust_var.set("")
             self.load_data()
+

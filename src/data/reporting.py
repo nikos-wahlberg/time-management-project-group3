@@ -1,10 +1,18 @@
-import pandas as pd
+import sys
 import os
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+src_dir = os.path.dirname(current_dir)
+
+if src_dir not in sys.path:
+    sys.path.append(src_dir)
+
+import pandas as pd
 from datetime import datetime
 from azure.storage.blob import BlobServiceClient
 from sqlalchemy import create_engine
 from io import StringIO
-from key_vault import get_database_credentials
+from server.key_vault import get_database_credentials
 
 def get_db_engine():
     """Fetches credentials from Key Vault and creates a SQLAlchemy engine."""
@@ -12,7 +20,6 @@ def get_db_engine():
     if not creds:
         raise ConnectionError("Failed to retrieve database credentials from Key Vault.")
     
-    # Using dictionary keys prevents "index out of range" errors
     db_uri = f"postgresql://{creds['user']}:{creds['password']}@{creds['host']}:{creds['port']}/{creds['database']}?sslmode=require"
     return create_engine(db_uri)
 
@@ -95,7 +102,7 @@ def run_report_process():
         return False, str(e)
 
 if __name__ == "__main__":    
-    print("Generating report manually using Key Vault secrets...")
+    print("Generating report...")
     success, message = run_report_process()
     if success:
         print(f"Success! Report uploaded as: {message}")
