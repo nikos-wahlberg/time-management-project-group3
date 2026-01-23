@@ -35,7 +35,7 @@ def handle_exception(e):
         "error": "Internal Server Error",
         "details": str(e) 
     }), 500
-    
+
 @app.route('/api/options', methods=['GET'])
 def get_options():
     """
@@ -135,4 +135,4 @@ def delete_customer_route(id):
         return jsonify({"error": str(e)}), 500
 # if __name__ == '__main__':
 #     # Run on 0.0.0.0 to be accessible, port 5000 is standard
-app.run(host='127.0.0.1', port=5000, debug=True)
+app.run(host='0.0.0.0', port=5000, debug=True)
