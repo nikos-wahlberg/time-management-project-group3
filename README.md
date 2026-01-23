@@ -16,6 +16,20 @@ The project was built in three agile stages:
 
 ---
 
+## 🛠 Tech Stack
+
+| Component | Technology |
+| :--- | :--- |
+| **Language** | Python 3.x (Tkinter, Flask, Azure SDK) |
+| **Cloud Provider** | Microsoft Azure |
+| **Database** | Azure Database for PostgreSQL |
+| **Storage** | Azure Blob Storage |
+| **Security** | Azure Key Vault |
+| **Infrastructure** | Resource Groups, Virtual Machines (Linux) |
+| **Tools** | Git, Jira, X2Go, Postman |
+
+---
+
 ## 🏗 Architecture & Features
 
 The project consists of two main applications communicating with Azure services:
@@ -34,20 +48,6 @@ The project consists of two main applications communicating with Azure services:
     * Cumulative working hours grouped by customer.
     * Average working hours per day.
 * **Cloud Integration:** Automatically uploads the generated report to an **Azure Storage Account (Blob)**.
-
----
-
-## 🛠 Tech Stack
-
-| Component | Technology |
-| :--- | :--- |
-| **Language** | Python 3.x (Tkinter, Flask, Azure SDK) |
-| **Cloud Provider** | Microsoft Azure |
-| **Database** | Azure Database for PostgreSQL |
-| **Storage** | Azure Blob Storage |
-| **Security** | Azure Key Vault |
-| **Infrastructure** | Resource Groups, Virtual Machines (Linux) |
-| **Tools** | Git, Jira, X2Go, Postman |
 
 ---
 
